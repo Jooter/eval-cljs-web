@@ -1,3 +1,0 @@
-{:require  [eval-cljs-web.app]
- :init-fns [eval-cljs-web.app/init]
- :compiler-options {:asset-path "js/app.out"}}
