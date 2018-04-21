@@ -1,3 +1,4 @@
-/target
-/.nrepl-port
 /out
+.cpcache/
+index.js
+
