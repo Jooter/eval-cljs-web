@@ -75,15 +75,65 @@
         ]]
       )))
 
+(def eval-env
+  '(let [rect (fn rect
+                ([c w h]
+                 [:svg/svg
+                  {:height h :width w}
+                  [:svg/rect
+                   {:height h :width w :fill (name c)}
+                   ]])
+
+                ([c w]
+                 (rect c w w))
+
+                ([c]
+                 (rect c 20))
+
+                ([]
+                 (rect :yellow 20))
+                )
+
+         square (fn sqare
+                  ([c w] (rect c w))
+                  ([c]   (rect c))
+                  ([]    (rect)))
+
+         circle (fn circle
+                  ([c r]
+                   (let [d (* 2 r)]
+                     [:svg/svg {:height d :width d}
+                      [:svg/circle
+                       {:cx r :cy r :r r :fill (name c)}
+                       ]]))
+
+                  ([c]
+                   (circle c 50))
+
+                  ([]
+                   (circle :blue 50))
+                  )
+         ]
+
+     ))
+
+(defn combine-with-env [f]
+  (seq
+   (conj
+    (vec eval-env)
+    f)))
+
+(defn eval-str-3 [s]
+  (eval (empty-state)
+        (combine-with-env (read-string s))
+        {:eval       js-eval}
+        identity
+        ))
+
 (def example-input-1
   (pp-str
-   '(let [w 50 c "green"]
-      [:svg/svg
-       {:height w :width w}
-       [:svg/rect
-        {:height w :width w :fill c}
-        ]]
-      )))
+  '(rect :blue 9 90)
+  ))
 
 #_(def example-input-1
   (pp-str
@@ -95,6 +145,20 @@
       }
      ]
    ))
+
+(defn keyup [output]
+  (fn [e]
+    (prn :key (.-key e))
+    (let [v (-> e .-target .-value)]
+      (reset! output (eval-str-3 v)))))
+
+(defn textarea1 [input output rows cols]
+  [:textarea
+   {:id "in1"
+    :on-keyup (keyup output)
+    :on-focus (keyup output)
+    :rows rows :cols cols}
+   @input])
 
 (defn view []
   (let [input (atom example-input-1)
@@ -109,19 +173,7 @@
          out1
          [:p #_(str out1)]]))
 
-     [:h3 "Press F8 to play"]
-     [:textarea
-      {:id "in1"
-       :on-keypress
-       (fn [e]
-         (let [v (-> e .-target .-value)]
-           (when (= "F8" (.-key e)) 
-             (reset! output
-                     (eval-str-2 v)))))
-
-       :rows 10 :cols 60}
-
-      @input]
+     (textarea1 input output 2 50)
 
      ]))
 
