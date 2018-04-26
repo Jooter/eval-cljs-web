@@ -167,13 +167,13 @@
      #_[:button {:on-click #(eval-str "(println \"hello world!\")")} "let's compile!"]
      #_[:button {:on-click #(reset! output (eval-str @input))} "let's compile!"]
      #_[:p]
+     (textarea1 input output 2 50)
      (rx
       (let [out1 (:value @output)]
         [:div
          out1
          [:p #_(str out1)]]))
 
-     (textarea1 input output 2 50)
 
      ]))
 
